@@ -55,11 +55,11 @@
  *  Function declarations
  * -------------------------------------------------------------
  */
-sofia_nul bErrorPrint(sofia_chr* fmt, ...);
-sofia_nul displayBuffer(Buffer* ptr_Buffer);
-sofia_lng getFileSize(sofia_chr* fname);
-sofia_int isNumber(const sofia_chr* ns);
-sofia_nul startBuffer(sofia_chr*, sofia_chr*, sofia_chr, sofia_int, sofia_int);
+yago_nul bErrorPrint(yago_chr* fmt, ...);
+yago_nul displayBuffer(Buffer* ptr_Buffer);
+yago_lng getFileSize(yago_chr* fname);
+yago_int isNumber(const yago_chr* ns);
+yago_nul startBuffer(yago_chr*, yago_chr*, yago_chr, yago_int, yago_int);
 
 /*
 ************************************************************
@@ -71,14 +71,14 @@ sofia_nul startBuffer(sofia_chr*, sofia_chr*, sofia_chr, sofia_int, sofia_int);
 ************************************************************
 */
 
-sofia_int mainBuffer(sofia_int argc, sofia_chr** argv) {
+yago_int mainBuffer(yago_int argc, yago_chr** argv) {
 
 	/* Create source input buffer */
-	sofia_chr* program = argv[0];
-	sofia_chr* input = argv[2];
-	sofia_chr mode = MODE_FIXED;
-	sofia_int isAnsiC = !ANSI_C;		/* ANSI C flag */
-	sofia_int size = 0, increment = 0, wrongNumber = 0;
+	yago_chr* program = argv[0];
+	yago_chr* input = argv[2];
+	yago_chr mode = MODE_FIXED;
+	yago_int isAnsiC = !ANSI_C;		/* ANSI C flag */
+	yago_sht size = 100, increment = 10, wrongNumber = 0;
 
 	/* Check if the compiler option is set to compile ANSI C */
 	/* __DATE__, __TIME__, __LINE__, __FILE__, __STDC__ are predefined preprocessor macros*/
@@ -140,12 +140,12 @@ sofia_int mainBuffer(sofia_int argc, sofia_chr** argv) {
 *	- Increment: buffer increment.
 ************************************************************
 */
-void startBuffer(sofia_chr* program, sofia_chr* input, sofia_chr mode, sofia_int size, sofia_int increment) {
+void startBuffer(yago_chr* program, yago_chr* input, yago_chr mode, yago_sht size, yago_sht increment) {
 
 	BufferPointer bufferp;		/* pointer to Buffer structure */
 	FILE* fileHandler;			/* input file handle */
-	sofia_int loadSize = 0;			/* the size of the file loaded in the buffer */
-	sofia_chr symbol;				/* symbol read from input file */
+	yago_int loadSize = 0;			/* the size of the file loaded in the buffer */
+	yago_chr symbol;				/* symbol read from input file */
 
 	/* Create buffer */
 	bufferp = bCreate(size, (char)increment, mode);
@@ -203,12 +203,12 @@ void startBuffer(sofia_chr* program, sofia_chr* input, sofia_chr mode, sofia_int
 ************************************************************
 */
 
-sofia_nul bErrorPrint(sofia_chr* fmt, ...) {
+yago_nul bErrorPrint(yago_chr* fmt, ...) {
 	/* Initialize variable list */
 	va_list ap;
 	va_start(ap, fmt);
 
-	(sofia_nul)vfprintf(stderr, fmt, ap);
+	(yago_nul)vfprintf(stderr, fmt, ap);
 	va_end(ap);
 
 	/* Move to new line */
@@ -223,7 +223,7 @@ sofia_nul bErrorPrint(sofia_chr* fmt, ...) {
 ************************************************************
 */
 
-sofia_nul displayBuffer(Buffer* ptr_Buffer) {
+yago_nul displayBuffer(Buffer* ptr_Buffer) {
 	printf("\nPrinting buffer parameters:\n\n");
 	printf("The capacity of the buffer is:  %d\n",
 		bGetSize(ptr_Buffer));
@@ -251,9 +251,9 @@ sofia_nul displayBuffer(Buffer* ptr_Buffer) {
 ************************************************************
 */
 
-sofia_lng getFileSize(sofia_chr* fname) {
+yago_lng getFileSize(yago_chr* fname) {
 	FILE* input;
-	sofia_lng flength;
+	yago_lng flength;
 	input = fopen(fname, "r");
 	if (input == NULL) {
 		bErrorPrint("%s%s", "Cannot open file: ", fname);
@@ -275,8 +275,8 @@ sofia_lng getFileSize(sofia_chr* fname) {
 ************************************************************
 */
 
-sofia_int isNumber(const sofia_chr* ns) {
-	sofia_chr c; sofia_int i = 0;
+yago_int isNumber(const yago_chr* ns) {
+	yago_chr c; yago_int i = 0;
 	if (ns == NULL) return 0;
 	while ((c = ns[i++]) == 0) {
 		if (!isdigit(c)) return 0;

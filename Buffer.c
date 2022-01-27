@@ -82,15 +82,29 @@ BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
 	/* TO_DO: Defensive programming */
 	switch (pBuffer->mode) {
 	case MODE_FIXED:
+		if (bIsFull(pBuffer) == YAGO_TRUE)
+		{
+			/* truncate the rest of the buffer to avoid memory overflow */
+		}
 		/* TO_DO: Adjust the fixed mode */
 		/* NO REALLOC HERE, MODE IS FIXED */
 	case MODE_ADDIT:
 		/* TO_DO: Adjust the additive mode */
-		/* CREAT REALLOC FUNCTION HERE*/
+
+		/* while buffer_flag != '\0' */
+		if (bIsFull(pBuffer) == YAGO_TRUE)
+		{
+			/* add more space through adding 10 */
+			/* pbuffer->size = realloc(pBuffer->size + pBuffer->increment)*/
+		}
+		/* CREATE REALLOC FUNCTION HERE*/
 	case MODE_MULTI:
 		/* TO_DO: Adjust the multiplicative mode */
+		if (bIsFull(pBuffer) == YAGO_TRUE)
+		{
+			/* add more space through multiplication by 10 */
+		}
 		/* CREATE REALLOC FUNCTION HERE */
-		;
 	}
 	/* TO_DO: Defensive programming */
 	/* TO_DO: Adjust the buffer */
@@ -155,6 +169,10 @@ yago_bol bDestroy(BufferPointer const pBuffer) {
 */
 yago_bol bIsFull(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
+	if (!(pBuffer->position.writePos >= pBuffer->size))
+	{
+		return YAGO_FALSE;
+	}
 	/* TO_DO: Check flag if buffer is FUL */
 	return YAGO_TRUE;
 }
