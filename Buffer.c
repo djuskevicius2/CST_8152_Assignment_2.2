@@ -77,6 +77,7 @@ BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 */
 
 BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
+
 	yago_int newSize = 0;
 	/* TO_DO: Defensive programming */
 	switch (pBuffer->mode) {
@@ -115,7 +116,7 @@ yago_bol bClear(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
 	pBuffer->position.writePos = pBuffer->position.markPos = pBuffer->position.readPos = 0;
 	/* TO_DO: Adjust flags original */
-	return yago_TRUE;
+	return YAGO_TRUE;
 }
 
 /*
@@ -135,7 +136,7 @@ yago_bol bClear(BufferPointer const pBuffer) {
 yago_bol bDestroy(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
 	/* TO_DO: Clear buffer data */
-	return yago_TRUE;
+	return YAGO_TRUE;
 }
 
 /*
@@ -155,7 +156,7 @@ yago_bol bDestroy(BufferPointer const pBuffer) {
 yago_bol bIsFull(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
 	/* TO_DO: Check flag if buffer is FUL */
-	return yago_TRUE;
+	return YAGO_TRUE;
 }
 
 /*
