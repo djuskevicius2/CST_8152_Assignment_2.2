@@ -59,22 +59,22 @@ enum BUFFERMODES {
 /* BITS                                (7654.3210) */
 #define yago_DEFAULT_FLAG 0x0F 	/* (0000.1111)_2 = (015)_10 */
 /* TO_DO: BIT 7: REL = Relocation */
-/* Need to define the following for each:            */
-/* SET_RLB: bitwise OR:  Mask: 0x80 (1000.0000)_2 = (80)_16 = (128)_10 */
-/* RST_RLB: bitwise AND: Mask: 0x7F (0111.1111)_2 = (7F)_16 = (127)_10 */
-/* CHK_RLB: bitwise AND: Mask: 0x80 (1000.0000)_2 */
-/* TO_DO: BIT 6: EOB = EndOfBuffer */
-/* SET_EOB: Mask: 0x60 (0100.0000)_2 = (60)_16 = (64)_10 */
-/* RST_EOB: Mask: 0xBF (1011.1111)_2 = (AF)_16 = (126)_10*/
-/* CHK_RLB: Mask: 0x60 (0100.0000)_2 */
-/* TO_DO: BIT 5: FUL = Full */
-/* SET_FUL: Mask: 0x20 (0010.0000)_2 */
-/* RST_FUL: Mask: 0xDF (1101.1111)_2 */
-/* CHK_FUL: Mask: 0x20 (0010.0000)_2 */
-/* TO_DO: BIT 4: EMP = Empty */
-/* SET_EMP: Mask: 0x10 (0001.0000)_2 */
-/* RST_FUL: Mask: 0xEF (1110.1111)_2 */
-/* CHK_FUL: Mask: 0x10 (0001.0000)_2 */
+/* Need to define the following for each: */
+#define yago_SET_RLB 0x80		/* (1000.0000)_2 */
+#define yago_RST_RLB 0x7F		/* (0111.1111)_2 */
+#define yago_CHK_RLB 0x80		/* (1000.0000)_2 */
+
+#define yago_SET_EOB 0x60		/* (0100.0000)_2 */
+#define yago_RST_EOB 0xBF		/* (1011.1111)_2 */
+#define yago_CHK_RLB 0x60		/* (0100.0000)_2 */
+
+#define yago_SET_FUL 0x20		/* (0010.0000)_2 */
+#define yago_RST_FUL 0xDF		/* (1101.1111)_2 */
+#define yago_CHK_FUL 0x20		/* (0010.0000)_2 */
+
+#define yago_SET_EMP 0x10		/* (0001.0000)_2 */
+#define yago_RST_EMP 0xEF		/* (1110.1111)_2 */
+#define yago_CHK_FUL 0x10		/* (0001.0000)_2 */
 
 
 /* STRUCTURES DEFINITION: SUFIXED BY LANGUAGE NAME (yago) .................................. */

@@ -39,8 +39,11 @@ Data types definitions
 */
 /* TO_DO: Define your typedefs */
 typedef char			yago_chr;
-typedef short			yago_int;
+typedef short			yago_sht;
+typedef int				yago_int;
+typedef unsigned int	yago_uit;
 typedef float			yago_flt;
+
 typedef void			yago_nul;
 
 typedef unsigned char	yago_bol;
