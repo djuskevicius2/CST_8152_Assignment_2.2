@@ -26,11 +26,11 @@
 #define DEBUG 0
 
 /* Logical constants - adapt for your language */
-#define YAGO_TRUE	1
+#define YAGO_TRUE  1
 #define YAGO_FALSE 0
 
 /* You should add your own constant definitions here */
-#define YAGO_MAX_SIZE				SHRT_MAX-1	/* maximum capacity */ 
+#define YAGO_MAX_SIZE 				SHRT_MAX-1	/* maximum capacity */ 
 
 /*
 ------------------------------------------------------------

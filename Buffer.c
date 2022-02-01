@@ -53,9 +53,28 @@
 BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 	BufferPointer b;
 	/* TO_DO: Defensive programming */
+	if (size == NULL || size == 0) {
+		size = BUFFER_DEFAULT_SIZE;
+		increment = BUFFER_DEFAULT_INCREMENT;
+	}
+	if (increment == NULL || increment == 0) {
+		mode = MODE_FIXED;
+	}
+	if (!(mode == MODE_FIXED || mode == MODE_ADDIT || mode == MODE_MULTI)) {
+		return BUFFER_ERROR; /* Exits because buffer cannot be created */
+	}
+	/* We can create the buffer because we have checked all the params */
 	b = (BufferPointer)calloc(1, sizeof(Buffer));
 	b->string = (yago_chr*)malloc(size);
+	if (b->string == NULL) { // Defensive programming
+		free(b);
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Adjust properties */
+	b->size = size;
+	b->increment = increment;
+	b->mode = mode;
+	b->flags = YAGO_DEFAULT_FLAG;
 	return b;
 }
 
@@ -77,39 +96,49 @@ BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 */
 
 BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
-
 	yago_int newSize = 0;
+	BufferPointer tempPBuffer;
+	tempPBuffer = pBuffer; /* Making a temporary pBuffer to act upon in case NULL must be returned */
 	/* TO_DO: Defensive programming */
-	switch (pBuffer->mode) {
-	case MODE_FIXED:
-		if (bIsFull(pBuffer) == YAGO_TRUE)
-		{
+	if (bIsFull(pBuffer)) {
+		tempPBuffer->flags &= RST_RLB; /* resetting RLB bit on flags */
+		switch (pBuffer->mode) {
+		case MODE_FIXED:
 			/* truncate the rest of the buffer to avoid memory overflow */
+			bRetract(pBuffer);
+			return pBuffer;
+		case MODE_ADDIT:
+			/* TO_DO: Adjust the additive mode */
+			newSize = tempPBuffer->size + tempPBuffer->increment;
+			if (newSize < 0 || newSize > YAGO_MAX_SIZE) {
+				return NULL;
+			}
+			/* CREATE REALLOC FUNCTION HERE*/
+			tempPBuffer->string = realloc(pBuffer->string, newSize);
+			if (tempPBuffer->string == NULL) {
+				free(tempPBuffer->string);
+				return NULL;
+			}
+		case MODE_MULTI:
+			/* TO_DO: Adjust the multiplicative mode */
+			newSize = tempPBuffer->size * tempPBuffer->increment;
+			if (newSize < 0 || newSize > YAGO_MAX_SIZE) {
+				return NULL;
+			}
+			/* CREATE REALLOC FUNCTION HERE */
+			tempPBuffer->string = realloc(pBuffer->string, newSize);
+			if (tempPBuffer->string == NULL) {
+				free(tempPBuffer);
+				return NULL;
+			}
 		}
-		/* TO_DO: Adjust the fixed mode */
-		/* NO REALLOC HERE, MODE IS FIXED */
-	case MODE_ADDIT:
-		/* TO_DO: Adjust the additive mode */
-
-		/* while buffer_flag != '\0' */
-		if (bIsFull(pBuffer) == YAGO_TRUE)
-		{
-			/* add more space through adding 10 */
-			/* pbuffer->size = realloc(pBuffer->size + pBuffer->increment)*/
-		}
-		/* CREATE REALLOC FUNCTION HERE*/
-	case MODE_MULTI:
-		/* TO_DO: Adjust the multiplicative mode */
-		if (bIsFull(pBuffer) == YAGO_TRUE)
-		{
-			/* add more space through multiplication by 10 */
-		}
-		/* CREATE REALLOC FUNCTION HERE */
+		/* TO_DO: Defensive programming */
+		/* TO_DO: Adjust the buffer */
 	}
-	/* TO_DO: Defensive programming */
-	/* TO_DO: Adjust the buffer */
-	pBuffer->string[pBuffer->position.writePos++] = ch;
-	return pBuffer;
+	else {
+		pBuffer->string[pBuffer->position.writePos++] = ch;
+		return pBuffer;
+	}
 }
 
 /*
@@ -128,8 +157,12 @@ BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
 */
 yago_bol bClear(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	pBuffer->position.writePos = pBuffer->position.markPos = pBuffer->position.readPos = 0;
 	/* TO_DO: Adjust flags original */
+	pBuffer->flags = YAGO_DEFAULT_FLAG;
 	return YAGO_TRUE;
 }
 
@@ -149,7 +182,12 @@ yago_bol bClear(BufferPointer const pBuffer) {
 */
 yago_bol bDestroy(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Clear buffer data */
+	free(pBuffer->string);
+	free(pBuffer);
 	return YAGO_TRUE;
 }
 
@@ -169,12 +207,20 @@ yago_bol bDestroy(BufferPointer const pBuffer) {
 */
 yago_bol bIsFull(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
-	if (!(pBuffer->position.writePos >= pBuffer->size))
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
+	if ((pBuffer->position.writePos >= pBuffer->size))
 	{
+		return YAGO_TRUE;
+	}
+	else if (pBuffer->flags & CHK_FUL == CHK_FUL) { /* 0010.0000 */
+		return YAGO_TRUE;
+	}
+	else {
+		/* TO_DO: Check flag if buffer is FUL */
 		return YAGO_FALSE;
 	}
-	/* TO_DO: Check flag if buffer is FUL */
-	return YAGO_TRUE;
 }
 
 /*
@@ -192,6 +238,9 @@ yago_bol bIsFull(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_int bGetWritePos(BufferPointer const pBuffer) {
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Defensive programming */
 	return pBuffer->position.writePos;
 }
@@ -211,6 +260,9 @@ yago_int bGetWritePos(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_int bGetSize(BufferPointer const pBuffer) {
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Defensive programming */
 	return pBuffer->size;
 }
@@ -230,6 +282,9 @@ yago_int bGetSize(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_int bGetMode(BufferPointer const pBuffer) {
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Defensive programming */
 	return pBuffer->mode;
 }
@@ -250,6 +305,9 @@ yago_int bGetMode(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_int bGetMarkPos(BufferPointer const pBuffer) {
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Defensive programming */
 	return pBuffer->position.markPos;
 }
@@ -272,8 +330,17 @@ yago_int bGetMarkPos(BufferPointer const pBuffer) {
 */
 yago_bol bSetMark(BufferPointer const pBuffer, yago_int mark) {
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Adjust the mark */
-	return yago_TRUE;
+	if (mark >= 0 && mark <= pBuffer->position.writePos) {
+		pBuffer->position.markPos = mark;
+		return YAGO_TRUE;
+	}
+	else {
+		return YAGO_FALSE;
+	}
 }
 
 /*
@@ -294,15 +361,19 @@ yago_int bPrint(BufferPointer const pBuffer) {
 	yago_int size = 1;
 	yago_chr c;
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	c = bGetChar(pBuffer);
 	/* TO_DO: Check flag if buffer EOB has achieved */
 	while (c>0) {
 		/* TO_DO: Adjust size */
 		printf("%c", c);
 		c = bGetChar(pBuffer);
+		size++;
 	}
 	return size;
-}
+}  /* Can we check EOB in bGetChar()? Or does it have to be done here */
 
 /*
 ***********************************************************
@@ -324,6 +395,9 @@ yago_int bLoad(BufferPointer const pBuffer, FILE* const fi) {
 	yago_int size = 1;
 	yago_chr c;
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL || fi == NULL) {
+		return BUFFER_ERROR;
+	}
 	c = (yago_chr)fgetc(fi);
 	while (!feof(fi)) {
 		if (!bAddChar(pBuffer, c)) {
@@ -332,6 +406,7 @@ yago_int bLoad(BufferPointer const pBuffer, FILE* const fi) {
 		}
 		c = (char)fgetc(fi);
 		/* Adjust size */
+		size++;
 	}
 	/* TO_DO: Defensive programming */
 	return size;
@@ -353,8 +428,16 @@ yago_int bLoad(BufferPointer const pBuffer, FILE* const fi) {
 */
 yago_bol bIsEmpty(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Check if it is empty */
-	return yago_FALSE;
+	else if ((pBuffer->flags & CHK_EMP) == CHK_EMP) {
+		return YAGO_TRUE;
+	}
+	else {
+		return YAGO_FALSE;
+	}
 }
 
 /*
@@ -372,8 +455,16 @@ yago_bol bIsEmpty(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_chr bGetChar(BufferPointer const pBuffer) {
+	if (pBuffer == NULL) {
+		return BUFFER_ERROR;
+	}
 	/* TO_DO: Defensive programming */
 	/* TO_DO: Adjust EOB flag */
+	if (pBuffer->position.readPos == pBuffer->position.writePos) {
+		pBuffer->flags = pBuffer->flags | SET_EOB;
+		return BUFFER_EOF;
+	}
+	pBuffer->flags = pBuffer->flags & RST_EOB;
 	return pBuffer->string[pBuffer->position.readPos++];
 }
 
@@ -394,9 +485,12 @@ yago_chr bGetChar(BufferPointer const pBuffer) {
 */
 yago_bol bRecover(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
+	if (pBuffer == NULL) {
+		return YAGO_FALSE;
+	}
 	pBuffer->position.readPos = 0;
 	pBuffer->position.markPos = 0;
-	return yago_TRUE;
+	return YAGO_TRUE;
 }
 
 
@@ -416,8 +510,13 @@ yago_bol bRecover(BufferPointer const pBuffer) {
 */
 yago_bol bRetract(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
-	pBuffer->position.readPos--;
-	return yago_TRUE;
+	if ((pBuffer->position.readPos - 1) < 0) {
+		return YAGO_FALSE;
+	}
+	else {
+		pBuffer->position.readPos--;
+		return YAGO_TRUE;
+	}
 }
 
 
@@ -438,7 +537,7 @@ yago_bol bRetract(BufferPointer const pBuffer) {
 yago_bol bRestore(BufferPointer const pBuffer) {
 	/* TO_DO: Defensive programming */
 	pBuffer->position.readPos = pBuffer->position.markPos;
-	return yago_TRUE;
+	return YAGO_TRUE;
 }
 
 
@@ -499,9 +598,16 @@ yago_int bGetIncrement(BufferPointer const pBuffer) {
 */
 yago_chr* bGetContent(BufferPointer const pBuffer, yago_int pos) {
 	/* TO_DO: Defensive programming */
-	return pBuffer->string + pos;
+	if (pos < 0) {
+		return BUFFER_EOF;
+	}
+	else if (pos >= pBuffer->position.writePos) {
+		return BUFFER_EOF;
+	}
+	else {
+		return pBuffer->string + pos;
+	}
 }
-
 
 /*
 ***********************************************************

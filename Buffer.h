@@ -57,7 +57,7 @@ enum BUFFERMODES {
 
 /* Add your bit-masks constant definitions here - Defined for yago */
 /* BITS                                (7654.3210) */
-#define yago_DEFAULT_FLAG 0x0F 	/* (0000.1111)_2 = (015)_10 */
+#define YAGO_DEFAULT_FLAG 0x0F 	/* (0000.1111)_2 = (015)_10 */
 /* TO_DO: BIT 7: REL = Relocation */
 #define SET_RLB 0x80		/* (1000.0000)_2 */
 #define RST_RLB 0x7F		/* (0111.1111)_2 */
@@ -65,7 +65,7 @@ enum BUFFERMODES {
 
 #define SET_EOB 0x60		/* (0100.0000)_2 */
 #define RST_EOB 0xBF		/* (1011.1111)_2 */
-#define CHK_RLB 0x60		/* (0100.0000)_2 */
+#define CHK_EOB 0x60		/* (0100.0000)_2 */
 
 #define SET_FUL 0x20		/* (0010.0000)_2 */
 #define RST_FUL 0xDF		/* (1101.1111)_2 */
@@ -73,7 +73,7 @@ enum BUFFERMODES {
 
 #define SET_EMP 0x10		/* (0001.0000)_2 */
 #define RST_EMP 0xEF		/* (1110.1111)_2 */
-#define CHK_FUL 0x10		/* (0001.0000)_2 */
+#define CHK_EMP 0x10		/* (0001.0000)_2 */
 
 
 /* STRUCTURES DEFINITION: SUFIXED BY LANGUAGE NAME (yago) .................................. */
