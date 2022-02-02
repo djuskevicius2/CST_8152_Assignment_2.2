@@ -63,9 +63,9 @@ enum BUFFERMODES {
 #define RST_RLB 0x7F		/* (0111.1111)_2 */
 #define CHK_RLB 0x80		/* (1000.0000)_2 */
 
-#define SET_EOB 0x60		/* (0100.0000)_2 */
+#define SET_EOB 0x40		/* (0100.0000)_2 */
 #define RST_EOB 0xBF		/* (1011.1111)_2 */
-#define CHK_EOB 0x60		/* (0100.0000)_2 */
+#define CHK_EOB 0x40		/* (0100.0000)_2 */
 
 #define SET_FUL 0x20		/* (0010.0000)_2 */
 #define RST_FUL 0xDF		/* (1101.1111)_2 */

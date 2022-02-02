@@ -78,7 +78,7 @@ yago_int mainBuffer(yago_int argc, yago_chr** argv) {
 	yago_chr* input = argv[2];
 	yago_chr mode = MODE_FIXED;
 	yago_int isAnsiC = !ANSI_C;		/* ANSI C flag */
-	yago_sht size = 100, increment = 10, wrongNumber = 0;
+	yago_sht size = 0, increment = 0, wrongNumber = 0;
 
 	/* Check if the compiler option is set to compile ANSI C */
 	/* __DATE__, __TIME__, __LINE__, __FILE__, __STDC__ are predefined preprocessor macros*/

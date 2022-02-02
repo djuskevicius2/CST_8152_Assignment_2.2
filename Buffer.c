@@ -53,22 +53,23 @@
 BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 	BufferPointer b;
 	/* TO_DO: Defensive programming */
-	if (size == NULL || size == 0) {
+	if (size == 0) { // if (size < 0 || size
 		size = BUFFER_DEFAULT_SIZE;
 		increment = BUFFER_DEFAULT_INCREMENT;
 	}
-	if (increment == NULL || increment == 0) {
+	if (increment == 0) {
 		mode = MODE_FIXED;
 	}
 	if (!(mode == MODE_FIXED || mode == MODE_ADDIT || mode == MODE_MULTI)) {
-		return BUFFER_ERROR; /* Exits because buffer cannot be created */
+		return NULL; /* Exits because buffer cannot be created */
 	}
 	/* We can create the buffer because we have checked all the params */
 	b = (BufferPointer)calloc(1, sizeof(Buffer));
+	if (b == NULL) return NULL;
 	b->string = (yago_chr*)malloc(size);
 	if (b->string == NULL) { // Defensive programming
 		free(b);
-		return BUFFER_ERROR;
+		return NULL;
 	}
 	/* TO_DO: Adjust properties */
 	b->size = size;
@@ -97,11 +98,11 @@ BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 
 BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
 	yago_int newSize = 0;
-	BufferPointer tempPBuffer;
-	tempPBuffer = pBuffer; /* Making a temporary pBuffer to act upon in case NULL must be returned */
+	yago_chr* tempPBuffer;
+	tempPBuffer = pBuffer->string; /* Making a temporary pBuffer->string to act upon in case NULL must be returned */
+	pBuffer->flags = pBuffer->flags & RST_RLB;
 	/* TO_DO: Defensive programming */
 	if (bIsFull(pBuffer)) {
-		tempPBuffer->flags &= RST_RLB; /* resetting RLB bit on flags */
 		switch (pBuffer->mode) {
 		case MODE_FIXED:
 			/* truncate the rest of the buffer to avoid memory overflow */
@@ -109,36 +110,43 @@ BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
 			return pBuffer;
 		case MODE_ADDIT:
 			/* TO_DO: Adjust the additive mode */
-			newSize = tempPBuffer->size + tempPBuffer->increment;
+			newSize = pBuffer->size + pBuffer->increment;
 			if (newSize < 0 || newSize > YAGO_MAX_SIZE) {
 				return NULL;
 			}
 			/* CREATE REALLOC FUNCTION HERE*/
-			tempPBuffer->string = realloc(pBuffer->string, newSize);
-			if (tempPBuffer->string == NULL) {
-				free(tempPBuffer->string);
+			tempPBuffer = (yago_chr*)realloc(pBuffer->string, newSize);
+			if (!tempPBuffer)
 				return NULL;
+			if (tempPBuffer != pBuffer->string) {
+				pBuffer->flags = pBuffer->flags | SET_RLB;
+				pBuffer->string = tempPBuffer;
 			}
+			if (pBuffer->flags & CHK_FUL)
+				pBuffer->flags = pBuffer->flags & RST_FUL;
+			pBuffer->size = newSize;
 		case MODE_MULTI:
 			/* TO_DO: Adjust the multiplicative mode */
-			newSize = tempPBuffer->size * tempPBuffer->increment;
+			newSize = pBuffer->size * pBuffer->increment;
 			if (newSize < 0 || newSize > YAGO_MAX_SIZE) {
 				return NULL;
 			}
 			/* CREATE REALLOC FUNCTION HERE */
-			tempPBuffer->string = realloc(pBuffer->string, newSize);
-			if (tempPBuffer->string == NULL) {
-				free(tempPBuffer);
+			tempPBuffer = (yago_chr*)realloc(pBuffer->string, newSize);
+			if (!tempPBuffer) {
 				return NULL;
 			}
+			if (tempPBuffer != pBuffer->string) {
+				pBuffer->flags = pBuffer->flags | SET_RLB;
+				pBuffer->string = tempPBuffer;
+			}
+			if (pBuffer->flags & CHK_FUL)
+				pBuffer->flags = pBuffer->flags & RST_FUL;
+			pBuffer->size = newSize;
 		}
-		/* TO_DO: Defensive programming */
-		/* TO_DO: Adjust the buffer */
 	}
-	else {
-		pBuffer->string[pBuffer->position.writePos++] = ch;
-		return pBuffer;
-	}
+	pBuffer->string[pBuffer->position.writePos++] = ch;
+	return pBuffer;
 }
 
 /*
@@ -214,7 +222,7 @@ yago_bol bIsFull(BufferPointer const pBuffer) {
 	{
 		return YAGO_TRUE;
 	}
-	else if (pBuffer->flags & CHK_FUL == CHK_FUL) { /* 0010.0000 */
+	else if ((pBuffer->flags & CHK_FUL) == CHK_FUL) { /* 0010.0000 */
 		return YAGO_TRUE;
 	}
 	else {
@@ -370,6 +378,7 @@ yago_int bPrint(BufferPointer const pBuffer) {
 		/* TO_DO: Adjust size */
 		printf("%c", c);
 		c = bGetChar(pBuffer);
+		pBuffer->flags = pBuffer->flags & CHK_EOB;
 		size++;
 	}
 	return size;
@@ -460,7 +469,7 @@ yago_chr bGetChar(BufferPointer const pBuffer) {
 	}
 	/* TO_DO: Defensive programming */
 	/* TO_DO: Adjust EOB flag */
-	if (pBuffer->position.readPos == pBuffer->position.writePos) {
+	if (pBuffer->position.readPos == pBuffer->position.writePos) { /* Either size = 0 or we have reached end of buffer (full or not) */
 		pBuffer->flags = pBuffer->flags | SET_EOB;
 		return BUFFER_EOF;
 	}
