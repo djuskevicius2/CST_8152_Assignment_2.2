@@ -9,12 +9,12 @@
 
 /*
 ************************************************************
-* File name: compilers.c
-* Compiler: MS Visual Studio 2022
-* Author: Paulo Sousa
-* Course: CST 8152 – Compilers, Lab Section: [011, 012, 013, 014]
+* File name: Compilers.c
+* Compiler: MS Visual Studio 2019
+* Author: Paulo Sousa, Daniel Juskevicius, Iain MacEachern
+* Course: CST 8152 – Compilers, Lab Section: 012
 * Assignment: A12, A22, A32.
-* Date: May 01 2021
+* Date: Feb 03 2022
 * Professor: Paulo Sousa
 * Purpose: This file is the main program of Compilers Project
 * Function list: main().

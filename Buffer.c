@@ -9,12 +9,12 @@
 
 /*
 ***********************************************************
-* File name: buffer.c
-* Compiler: MS Visual Studio 2022
-* Author: Paulo Sousa
-* Course: CST 8152 – Compilers, Lab Section: [011, 012, 013, 014]
+* File name: Buffer.c
+* Compiler: MS Visual Studio 2019
+* Author: Paulo Sousa, Daniel Juskevicius, Iain MacEachern
+* Course: CST 8152 – Compilers, Lab Section: 012
 * Assignment: A12.
-* Date: Jan 01 2022
+* Date: Feb 03 2022
 * Professor: Paulo Sousa
 * Purpose: This file is the main code for Buffer (A12)
 ************************************************************
@@ -41,29 +41,27 @@
 *   increment = increment factor
 *   mode = operational mode
 * Return value: bPointer (pointer to Buffer)
-* Algorithm: Allocation of memory according to inicial (default) values.
-* TO_DO: 
-*	- Adjust datatypes for your LANGUAGE.
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Check flags.
+* Algorithm: Allocation of memory according to initial (default) values.
 *************************************************************
 */
 
 BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 	BufferPointer b;
-	/* TO_DO: Defensive programming */
-	if (size == 0) { // if (size < 0 || size
+	/* Set the buffer to a default size and increment if no params are passed to main(). */
+	if (size == 0) {
 		size = BUFFER_DEFAULT_SIZE;
 		increment = BUFFER_DEFAULT_INCREMENT;
 	}
 	if (increment == 0) {
 		mode = MODE_FIXED;
 	}
+	/* If the assigned mode does not match any other modes,
+	 * the program exits because buffer cannot be created. 
+	 */
 	if (!(mode == MODE_FIXED || mode == MODE_ADDIT || mode == MODE_MULTI)) {
-		return NULL; /* Exits because buffer cannot be created */
+		return NULL; 
 	}
-	/* We can create the buffer because we have checked all the params */
+	/* Buffer can now be created since all params have been checked. */
 	b = (BufferPointer)calloc(1, sizeof(Buffer));
 	if (b == NULL) return NULL;
 	b->string = (yago_chr*)malloc(size);
@@ -71,7 +69,7 @@ BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 		free(b);
 		return NULL;
 	}
-	/* TO_DO: Adjust properties */
+	/* Adjusting properties of buffer after creation. */
 	b->size = size;
 	b->increment = increment;
 	b->mode = mode;
@@ -89,57 +87,59 @@ BufferPointer bCreate(yago_int size, yago_int increment, yago_int mode) {
 *   ch = char to be added
 * Return value:
 *	bPointer (pointer to Buffer)
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 
 BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
 	yago_int newSize = 0;
 	yago_chr* tempPBuffer;
-	tempPBuffer = pBuffer->string; /* Making a temporary pBuffer->string to act upon in case NULL must be returned */
+	/* Making a temporary pBuffer->string to act upon in case NULL must be returned */
+	tempPBuffer = pBuffer->string; 
 	pBuffer->flags = pBuffer->flags & RST_RLB;
-	/* TO_DO: Defensive programming */
+	
 	if (bIsFull(pBuffer)) {
 		switch (pBuffer->mode) {
+		/* If mode is fixed, we truncate the rest of the buffer. */
 		case MODE_FIXED:
-			/* truncate the rest of the buffer to avoid memory overflow */
 			bRetract(pBuffer);
 			return pBuffer;
+		/* If mode is additive, we adjust accordingly. */
 		case MODE_ADDIT:
-			/* TO_DO: Adjust the additive mode */
+			/* Assigning a temp variable the new size of the buffer. */
 			newSize = pBuffer->size + pBuffer->increment;
 			if (newSize < 0 || newSize > YAGO_MAX_SIZE) {
 				return NULL;
 			}
-			/* CREATE REALLOC FUNCTION HERE*/
+			/* Reallocating memory for the temp buffer, in case of failure. */
 			tempPBuffer = (yago_chr*)realloc(pBuffer->string, newSize);
 			if (!tempPBuffer)
 				return NULL;
+			/* As long as there is no crash, we modify the original buffer */
 			if (tempPBuffer != pBuffer->string) {
 				pBuffer->flags = pBuffer->flags | SET_RLB;
 				pBuffer->string = tempPBuffer;
 			}
+			/* We reset the buffer full bit */
 			if (pBuffer->flags & CHK_FUL)
 				pBuffer->flags = pBuffer->flags & RST_FUL;
 			pBuffer->size = newSize;
 		case MODE_MULTI:
-			/* TO_DO: Adjust the multiplicative mode */
+			/* Assigning a temp variable the new size of the buffer. */
 			newSize = pBuffer->size * pBuffer->increment;
 			if (newSize < 0 || newSize > YAGO_MAX_SIZE) {
 				return NULL;
 			}
-			/* CREATE REALLOC FUNCTION HERE */
+			/* Reallocating memory for the temp buffer, in case of failure. */
 			tempPBuffer = (yago_chr*)realloc(pBuffer->string, newSize);
 			if (!tempPBuffer) {
 				return NULL;
 			}
+			/* As long as there is no crash, we modify the original buffer */
 			if (tempPBuffer != pBuffer->string) {
 				pBuffer->flags = pBuffer->flags | SET_RLB;
 				pBuffer->string = tempPBuffer;
 			}
+			/* We reset the buffer full bit */
 			if (pBuffer->flags & CHK_FUL)
 				pBuffer->flags = pBuffer->flags & RST_FUL;
 			pBuffer->size = newSize;
@@ -157,19 +157,15 @@ BufferPointer bAddChar(BufferPointer const pBuffer, yago_chr ch) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	Boolean value about operation success
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_bol bClear(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
 	pBuffer->position.writePos = pBuffer->position.markPos = pBuffer->position.readPos = 0;
-	/* TO_DO: Adjust flags original */
+	/* Adjust the default flags */
 	pBuffer->flags = YAGO_DEFAULT_FLAG;
 	return YAGO_TRUE;
 }
@@ -182,14 +178,10 @@ yago_bol bClear(BufferPointer const pBuffer) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	Boolean value about operation success
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_bol bDestroy(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -207,14 +199,10 @@ yago_bol bDestroy(BufferPointer const pBuffer) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	Boolean value about operation success
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_bol bIsFull(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -239,13 +227,10 @@ yago_bol bIsFull(BufferPointer const pBuffer) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	addcPosition value
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_int bGetWritePos(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -261,13 +246,10 @@ yago_int bGetWritePos(BufferPointer const pBuffer) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	Size of buffer.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_int bGetSize(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -283,13 +265,10 @@ yago_int bGetSize(BufferPointer const pBuffer) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	operational mode.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_int bGetMode(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -306,13 +285,10 @@ yago_int bGetMode(BufferPointer const pBuffer) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	mark offset.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_int bGetMarkPos(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -330,18 +306,14 @@ yago_int bGetMarkPos(BufferPointer const pBuffer) {
 *   mark = mark position for char
 * Return value:
 *	Boolean value about operation success
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_bol bSetMark(BufferPointer const pBuffer, yago_int mark) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
-	/* TO_DO: Adjust the mark */
+	/* Adjust the mark */
 	if (mark >= 0 && mark <= pBuffer->position.writePos) {
 		pBuffer->position.markPos = mark;
 		return YAGO_TRUE;
@@ -359,16 +331,12 @@ yago_bol bSetMark(BufferPointer const pBuffer, yago_int mark) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	Number of chars printed.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_int bPrint(BufferPointer const pBuffer) {
 	yago_int size = 1;
 	yago_chr c;
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -382,7 +350,7 @@ yago_int bPrint(BufferPointer const pBuffer) {
 		size++;
 	}
 	return size;
-}  /* Can we check EOB in bGetChar()? Or does it have to be done here */
+}
 
 /*
 ***********************************************************
@@ -394,16 +362,12 @@ yago_int bPrint(BufferPointer const pBuffer) {
 *   fi = pointer to file descriptor
 * Return value:
 *	Number of chars read and put in buffer.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_int bLoad(BufferPointer const pBuffer, FILE* const fi) {
 	yago_int size = 1;
 	yago_chr c;
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL || fi == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -417,7 +381,6 @@ yago_int bLoad(BufferPointer const pBuffer, FILE* const fi) {
 		/* Adjust size */
 		size++;
 	}
-	/* TO_DO: Defensive programming */
 	return size;
 }
 
@@ -436,7 +399,7 @@ yago_int bLoad(BufferPointer const pBuffer, FILE* const fi) {
 *************************************************************
 */
 yago_bol bIsEmpty(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
@@ -464,10 +427,10 @@ yago_bol bIsEmpty(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_chr bGetChar(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return BUFFER_ERROR;
 	}
-	/* TO_DO: Defensive programming */
 	/* TO_DO: Adjust EOB flag */
 	if (pBuffer->position.readPos == pBuffer->position.writePos) { /* Either size = 0 or we have reached end of buffer (full or not) */
 		pBuffer->flags = pBuffer->flags | SET_EOB;
@@ -493,7 +456,7 @@ yago_chr bGetChar(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_bol bRecover(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pBuffer == NULL) {
 		return YAGO_FALSE;
 	}
@@ -518,7 +481,7 @@ yago_bol bRecover(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_bol bRetract(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if ((pBuffer->position.readPos - 1) < 0) {
 		return YAGO_FALSE;
 	}
@@ -544,7 +507,7 @@ yago_bol bRetract(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_bol bRestore(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	pBuffer->position.readPos = pBuffer->position.markPos;
 	return YAGO_TRUE;
 }
@@ -565,6 +528,7 @@ yago_bol bRestore(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_int bGetReadPos(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	/* TO_DO: Defensive programming */
 	return pBuffer->position.readPos;
 }
@@ -585,6 +549,7 @@ yago_int bGetReadPos(BufferPointer const pBuffer) {
 *************************************************************
 */
 yago_int bGetIncrement(BufferPointer const pBuffer) {
+	/* Defensive programming in case the operation fails */
 	/* TO_DO: Defensive programming */
 	return pBuffer->increment;
 }
@@ -599,14 +564,10 @@ yago_int bGetIncrement(BufferPointer const pBuffer) {
 *   pos = position to get the pointer
 * Return value:
 *	Position of string char.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 yago_chr* bGetContent(BufferPointer const pBuffer, yago_int pos) {
-	/* TO_DO: Defensive programming */
+	/* Defensive programming in case the operation fails */
 	if (pos < 0) {
 		return BUFFER_EOF;
 	}
@@ -626,17 +587,12 @@ yago_chr* bGetContent(BufferPointer const pBuffer, yago_int pos) {
 *   pBuffer = pointer to Buffer Entity
 * Return value:
 *	Flags from Buffer.
-* TO_DO:
-*   - Use defensive programming
-*	- Check boundary conditions
-*	- Adjust for your LANGUAGE.
 *************************************************************
 */
 #define FLAGS_
 #undef FLAGS_
 #ifndef FLAGS_
 yago_flg bGetFlags(BufferPointer const pBuffer) {
-	/* TO_DO: Defensive programming */
 	return pBuffer->flags;
 }
 #else

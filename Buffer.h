@@ -10,13 +10,13 @@
 /*
 ************************************************************
 * File name: Buffer.h
-* Compiler: MS Visual Studio 2022
-* Author: Paulo Sousa
+* Compiler: MS Visual Studio 2019
+* Author: Paulo Sousa, Daniel Juskevicius, Iain MacEachern
 * Course: CST 8152 – Compilers, Lab Section: [011, 012, 013, 014]
 * Assignment: A12.
-* Date: Jan 01 2022
+* Date: Feb 03 2022
 * Professor: Paulo Sousa
-* Purpose: This file is the main header for Parser (.h)
+* Purpose: This file is the main header for Buffer (.h)
 ************************************************************
 */
 
@@ -44,8 +44,6 @@ enum BUFFERMODES {
 	MODE_ADDIT = 'a',
 	MODE_MULTI = 'm'
 };
-
-/* TO_DO: Adjust all constants to your Language */
 
 #define BUFFER_ERROR (-1)						/* General error message */
 #define BUFFER_EOF '\0'							/* General EOF */

@@ -9,12 +9,12 @@
 
 /*
 ************************************************************
-* File name: compilers.h
-* Compiler: MS Visual Studio 2022
-* Author: Paulo Sousa
-* Course: CST 8152 – Compilers, Lab Section: [011, 012, 013, 014]
-* Assignment: A12, A22, A32.
-* Date: Jan 01 2022
+* File name: Compilers.h
+* Compiler: MS Visual Studio 2019
+* Author: Paulo Sousa, Daniel Juskevicius, Iain MacEachern
+* Course: CST 8152 – Compilers, Lab Section: 012
+* Assignment: A12
+* Date: Feb 03 2022
 * Professor: Paulo Sousa
 * Purpose: This file defines the functions called by main function.
 * Function list: mainBuffer(), mainScanner(), mainParser().
@@ -25,11 +25,11 @@
 
 #define DEBUG 0
 
-/* Logical constants - adapt for your language */
+/* Logical constants */
 #define YAGO_TRUE  1
 #define YAGO_FALSE 0
 
-/* You should add your own constant definitions here */
+/* Constant Max size of the buffer, in bytes */
 #define YAGO_MAX_SIZE 				SHRT_MAX-1	/* maximum capacity */ 
 
 /*
@@ -37,7 +37,6 @@
 Data types definitions
 ------------------------------------------------------------
 */
-/* TO_DO: Define your typedefs */
 typedef char			yago_chr;
 typedef short			yago_sht;
 typedef int				yago_int;

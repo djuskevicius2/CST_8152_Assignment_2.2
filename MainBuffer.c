@@ -10,14 +10,15 @@
 /*
 ************************************************************
 * File name: mainBuffer.c
-* Compiler: MS Visual Studio 2022
-* Author: Paulo Sousa
-* Course: CST 8152 – Compilers, Lab Section: [011, 012, 013, 014]
-* Assignment: A12, A22, A32.
-* Date: Jan 01 2022
+* Compiler: MS Visual Studio 2019
+* Author: Paulo Sousa, Daniel Juskevicius, Iain MacEachearn
+* Course: CST 8152 – Compilers, Lab Section: 012
+* Assignment: A12
+* Date: Feb 3 2022
 * Professor: Paulo Sousa
 * Purpose: This file is the main code for Buffer (A12)
-* Function list: (...).
+* Function list: bErrorPrint(), displayBuffer(),
+* getFileSize(), isNumber(), startBuffer()
 *************************************************************/
 
 /*
@@ -142,8 +143,8 @@ yago_int mainBuffer(yago_int argc, yago_chr** argv) {
 */
 void startBuffer(yago_chr* program, yago_chr* input, yago_chr mode, yago_sht size, yago_sht increment) {
 
-	BufferPointer bufferp;		/* pointer to Buffer structure */
-	FILE* fileHandler;			/* input file handle */
+	BufferPointer bufferp;			/* pointer to Buffer structure */
+	FILE* fileHandler;				/* input file handle */
 	yago_int loadSize = 0;			/* the size of the file loaded in the buffer */
 	yago_chr symbol;				/* symbol read from input file */
 
