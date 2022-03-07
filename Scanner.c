@@ -63,13 +63,13 @@ TO_DO: Global vars definitions
 /* Global objects - variables */
 /* This buffer is used as a repository for string literals. */
 extern BufferPointer stringLiteralTable;	/* String literal table */
-sofia_int line;								/* Current line number of the source code */
-extern sofia_int errorNumber;				/* Defined in platy_st.c - run-time error number */
+yago_int line;								/* Current line number of the source code */
+extern yago_int errorNumber;				/* Defined in platy_st.c - run-time error number */
 
-extern sofia_int stateType[];
-extern sofia_chr* keywordTable[];
+extern yago_int stateType[];
+extern yago_chr* keywordTable[];
 extern PTR_ACCFUN finalStateTable[];
-extern sofia_int transitionTable[][TABLE_COLUMNS];
+extern yago_int transitionTable[][TABLE_COLUMNS];
 
 /* Local(file) global objects - variables */
 static BufferPointer lexemeBuffer;			/* Pointer to temporary lexeme buffer */
@@ -83,7 +83,7 @@ static BufferPointer sourceBuffer;			/* Pointer to input source buffer */
  */
  /* TO_DO: Follow the standard and adjust datatypes */
 
-sofia_int startScanner(BufferPointer psc_buf) {
+yago_int startScanner(BufferPointer psc_buf) {
 	/* in case the buffer has been read previously  */
 	bRecover(psc_buf);
 	bClear(stringLiteralTable);
@@ -108,14 +108,14 @@ Token tokenizer(void) {
 	/* TO_DO: Follow the standard and adjust datatypes */
 
 	Token currentToken = { 0 }; /* token to return after pattern recognition. Set all structure members to 0 */
-	sofia_chr c;	/* input symbol */
-	sofia_int state = 0;		/* initial state of the FSM */
-	sofia_int lexStart;		/* start offset of a lexeme in the input char buffer (array) */
-	sofia_int lexEnd;		/* end offset of a lexeme in the input char buffer (array)*/
+	yago_chr c;	/* input symbol */
+	yago_int state = 0;		/* initial state of the FSM */
+	yago_int lexStart;		/* start offset of a lexeme in the input char buffer (array) */
+	yago_int lexEnd;		/* end offset of a lexeme in the input char buffer (array)*/
 
-	sofia_int lexLength;		/* token length */
-	sofia_int i;				/* counter */
-	sofia_chr newc;			/* new char */
+	yago_int lexLength;		/* token length */
+	yago_int i;				/* counter */
+	yago_chr newc;			/* new char */
 	
 	while (1) { /* endless loop broken by token returns it will generate a warning */
 		c = bGetChar(sourceBuffer);
@@ -244,9 +244,9 @@ Token tokenizer(void) {
  */
  /* TO_DO: Just change the datatypes */
 
-sofia_int nextState(sofia_int state, sofia_chr c) {
-	sofia_int col;
-	sofia_int next;
+yago_int nextState(yago_int state, yago_chr c) {
+	yago_int col;
+	yago_int next;
 	col = nextClass(c);
 	next = transitionTable[state][col];
 	if (DEBUG)
@@ -274,8 +274,8 @@ sofia_int nextState(sofia_int state, sofia_chr c) {
 /* Adjust the logic to return next column in TT */
 /*	[A-z](0), [0-9](1),	_(2), &(3), "(4), SEOF(5), other(6) */
 
-sofia_int nextClass(sofia_chr c) {
-	sofia_int val = -1;
+yago_int nextClass(yago_chr c) {
+	yago_int val = -1;
 	switch (c) {
 	case CHRCOL2:
 		val = 2;
@@ -316,22 +316,22 @@ sofia_int nextClass(sofia_chr c) {
  */
  /* TO_DO: Adjust the function for ID */
 
-Token funcID(sofia_chr lexeme[]) {
+Token funcID(yago_chr lexeme[]) {
 	Token currentToken = { 0 };
 	size_t length = strlen(lexeme);
 	char lastch = lexeme[length - 1];
-	int isID = SOFIA_FALSE;
+	int isID = YAGO_FALSE;
 	switch (lastch) {
 		case MNIDPREFIX:
 			currentToken.code = MNID_T;
-			isID = SOFIA_TRUE;
+			isID = YAGO_TRUE;
 			break;
 		default:
 			// Test Keyword
 			currentToken = funcKEY(lexeme);
 			break;
 	}
-	if (isID == SOFIA_TRUE) {
+	if (isID == YAGO_TRUE) {
 		strncpy(currentToken.attribute.idLexeme, lexeme, VID_LEN);
 		currentToken.attribute.idLexeme[VID_LEN] = CHARSEOF0;
 	}
@@ -351,9 +351,9 @@ Token funcID(sofia_chr lexeme[]) {
  */
 /* TO_DO: Adjust the function for SL */
 
-Token funcSL(sofia_chr lexeme[]) {
+Token funcSL(yago_chr lexeme[]) {
 	Token currentToken = { 0 };
-	sofia_int i = 0, len = (sofia_int)strlen(lexeme);
+	yago_int i = 0, len = (yago_int)strlen(lexeme);
 	currentToken.attribute.contentString = bGetWritePos(stringLiteralTable);
 	for (i = 1; i < len - 1; i++) {
 		if (lexeme[i] == '\n')
@@ -384,9 +384,9 @@ Token funcSL(sofia_chr lexeme[]) {
  */
  /* TO_DO: Adjust the function for Keywords */
 
-Token funcKEY(sofia_chr lexeme[]) {
+Token funcKEY(yago_chr lexeme[]) {
 	Token currentToken = { 0 };
-	sofia_int kwindex = -1, j = 0;
+	yago_int kwindex = -1, j = 0;
 	for (j = 0; j < KWT_SIZE; j++)
 		if (!strcmp(lexeme, &keywordTable[j][0]))
 			kwindex = j;
@@ -413,9 +413,9 @@ Token funcKEY(sofia_chr lexeme[]) {
  */
  /* TO_DO: Adjust the function for Errors */
 
-Token funcErr(sofia_chr lexeme[]) {
+Token funcErr(yago_chr lexeme[]) {
 	Token currentToken = { 0 };
-	sofia_int i = 0, len = (sofia_int)strlen(lexeme);
+	yago_int i = 0, len = (yago_int)strlen(lexeme);
 	if (len > ERR_LEN) {
 		strncpy(currentToken.attribute.errLexeme, lexeme, ERR_LEN - 3);
 		currentToken.attribute.errLexeme[ERR_LEN - 3] = CHARSEOF0;
@@ -438,8 +438,8 @@ Token funcErr(sofia_chr lexeme[]) {
  ***********************************************************
  */
 
-sofia_nul printToken(Token t) {
-	extern sofia_chr* keywordTable[]; /* link to keyword table in */
+yago_nul printToken(Token t) {
+	extern yago_chr* keywordTable[]; /* link to keyword table in */
 	switch (t.code) {
 	case RTE_T:
 		printf("RTE_T\t\t%s", t.attribute.errLexeme);

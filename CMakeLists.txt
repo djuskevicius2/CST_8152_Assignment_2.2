@@ -11,6 +11,7 @@ project ("CompilerAssignment")
 add_executable (CompilerAssignment
 	"Compilers.h"	"Compilers.c"
 	"Buffer.h"		"Buffer.c"		"MainBuffer.c"
+	"Scanner.h"		"Scanner.c"		"MainScanner.c" 
 )
 
 # TO_DO: Add tests and install targets if needed.

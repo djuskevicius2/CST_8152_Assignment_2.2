@@ -64,32 +64,32 @@ typedef enum SourceEndOfFile { SEOF_0, SEOF_255 } EofOperator;
 
 /* TO_DO: Data structures for declaring the token and its attributes */
 typedef union TokenAttribute {
-	sofia_int codeType;      /* integer attributes accessor */
+	yago_int codeType;      /* integer attributes accessor */
 	AriOperator arithmeticOperator;		/* arithmetic operator attribute code */
 	RelOperator relationalOperator;		/* relational operator attribute code */
 	LogOperator logicalOperator;		/* logical operator attribute code */
 	EofOperator seofType;				/* source-end-of-file attribute code */
-	sofia_int intValue;						/* integer literal attribute (value) */
-	sofia_int keywordIndex;					/* keyword index in the keyword table */
-	sofia_int contentString;				/* string literal offset from the beginning of the string literal buffer (stringLiteralTable->content) */
-	sofia_flt floatValue;					/* floating-point literal attribute (value) */
-	sofia_chr idLexeme[VID_LEN + 1];		/* variable identifier token attribute */
-	sofia_chr errLexeme[ERR_LEN + 1];		/* error token attribite */
+	yago_int intValue;						/* integer literal attribute (value) */
+	yago_int keywordIndex;					/* keyword index in the keyword table */
+	yago_int contentString;				/* string literal offset from the beginning of the string literal buffer (stringLiteralTable->content) */
+	yago_flt floatValue;					/* floating-point literal attribute (value) */
+	yago_chr idLexeme[VID_LEN + 1];		/* variable identifier token attribute */
+	yago_chr errLexeme[ERR_LEN + 1];		/* error token attribite */
 } TokenAttribute;
 
 /* TO_DO: Should be used if no symbol table is implemented */
 typedef struct idAttibutes {
-	sofia_flg flags;			/* Flags information */
+	yago_flg flags;			/* Flags information */
 	union {
-		sofia_int intValue;				/* Integer value */
-		sofia_flt floatValue;			/* Float value */
-		sofia_nul* stringContent;		/* String value */
+		yago_int intValue;				/* Integer value */
+		yago_flt floatValue;			/* Float value */
+		yago_nul* stringContent;		/* String value */
 	} values;
 } IdAttibutes;
 
 /* Token declaration */
 typedef struct Token {
-	sofia_int code;				/* token code */
+	yago_int code;				/* token code */
 	TokenAttribute attribute;	/* token attribute */
 	IdAttibutes   idAttribute;	/* not used in this scanner implementation - for further use */
 } Token;
@@ -124,7 +124,7 @@ typedef struct Token {
 #define MNIDPREFIX '&'
 
 /* TO_DO: Transition table - type of states defined in separate table */
-static sofia_int transitionTable[][TABLE_COLUMNS] = {
+static yago_int transitionTable[][TABLE_COLUMNS] = {
 /*   [A-z] , [0-9],    _,    &,    ", SEOF, other
 	   L(0),  D(1), U(2), M(3), Q(4), E(5),  O(6) */
 	{     1,    ES,   ES,   ES,    4,   ER,   ES}, // S0: NOAS
@@ -143,7 +143,7 @@ static sofia_int transitionTable[][TABLE_COLUMNS] = {
 #define ASWR	2		/* accepting state with retract */
 
 /* TO_DO: Define list of acceptable states */
-static sofia_int stateType[] = {
+static yago_int stateType[] = {
 	NOAS, /* 00 */
 	NOAS, /* 01 */
 	ASNR, /* 02 (MID) - Methods */
@@ -161,9 +161,9 @@ TO_DO: Adjust your functions'definitions
 */
 
 /* Static (local) function  prototypes */
-sofia_int startScanner(BufferPointer psc_buf);
-static sofia_int nextClass(sofia_chr c);			/* character class function */
-static sofia_int nextState(sofia_int, sofia_chr);		/* state machine function */
+yago_int startScanner(BufferPointer psc_buf);
+static yago_int nextClass(yago_chr c);			/* character class function */
+static yago_int nextState(yago_int, yago_chr);		/* state machine function */
 
 /*
 -------------------------------------------------
@@ -172,13 +172,13 @@ Automata definitions
 */
 
 /* TO_DO: Pointer to function (of one char * argument) returning Token */
-typedef Token(*PTR_ACCFUN)(sofia_chr* lexeme);
+typedef Token(*PTR_ACCFUN)(yago_chr* lexeme);
 
 /* Declare accepting states functions */
-Token funcSL	(sofia_chr lexeme[]);
-Token funcID	(sofia_chr lexeme[]);
-Token funcKEY	(sofia_chr lexeme[]);
-Token funcErr	(sofia_chr lexeme[]);
+Token funcSL	(yago_chr lexeme[]);
+Token funcID	(yago_chr lexeme[]);
+Token funcKEY	(yago_chr lexeme[]);
+Token funcErr	(yago_chr lexeme[]);
 
 /* 
  * Accepting function (action) callback table (array) definition 
@@ -207,7 +207,7 @@ Language keywords
 #define KWT_SIZE 10
 
 /* TO_DO: Define the list of keywords */
-static sofia_chr* keywordTable[KWT_SIZE] = {
+static yago_chr* keywordTable[KWT_SIZE] = {
 	"DATA",
 	"CODE",
 	"INT",
