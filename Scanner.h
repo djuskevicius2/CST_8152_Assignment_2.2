@@ -161,7 +161,7 @@ static yago_int transitionTable[][TABLE_COLUMNS] = {
 
 /* TO_DO: Transition table - type of states defined in separate table - COMPLETED */
 static yago_int transitionTable[][TABLE_COLUMNS] = {
-/*	  [A-z], [0-9], 	_, fun/U,	  ",	 ',	    #,    ###,	  .,	 :,  YEOF, other	
+/*	  [A-z], [0-9], 	_, fun/U,	  ",	 ',	    #,    ###,	  .,	 :,  SEOF, other	
 	   L(0),  D(1),  U(2),  M(3),  S(4), CH(5),  C(6), MLC(7), P(8), CO(9), E(10), O(11) */
 	{     1,     7,     3,     5,    11,    13,    15,    17,    ES,    ES,    ER,    ES}, // S0:  NOAS
 	{     1,     1,     1,    ES,    ES,    ES,    ES,    ES,    ES,    ES,    ER,    ES}, // S1:  NOAS
