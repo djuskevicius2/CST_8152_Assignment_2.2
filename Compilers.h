@@ -71,9 +71,9 @@ Main functions signatures
 (Codes will be updated during next assignments)
 ------------------------------------------------------------
 */
-yago_int mainBuffer	(yago_int argc, yago_chr** argv);
-/*
+yago_int mainBuffer		(yago_int argc, yago_chr** argv);
 yago_int mainScanner	(yago_int argc, yago_chr** argv);
-yago_int mainParser	(yago_int argc, yago_chr** argv);
+/*
+yago_int mainParser		(yago_int argc, yago_chr** argv);
 */
 #endif

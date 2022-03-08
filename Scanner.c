@@ -160,7 +160,7 @@ Token tokenizer(void) {
 			do {
 				c = bGetChar(sourceBuffer);
 				if (c == CHARSEOF0 || c == CHARSEOF255) {
-					bRetract(sourceBuffer);
+					bRetract(sourceBuffer); // restore one position to the left
 					//return currentToken;
 				} else if (c=='\n') {
 					line++;
@@ -213,7 +213,7 @@ Token tokenizer(void) {
 			return currentToken;
 		} // switch
 
-	} //while
+	} // while
 
 } // tokenizer
 

@@ -54,15 +54,13 @@ yago_int main(int argc, char** argv) {
 			PGM_PARSER, "] - Parser\n");
 		return EXIT_FAILURE;
 	}
-	yago_chr option = argv[1][0];
+	yago_chr option = argv[2][0];
 	switch (option) {
 	case PGM_BUFFER:
 		mainBuffer(argc, argv);
 		break;
 	case PGM_SCANNER:
-		/*
 		mainScanner(argc, argv);
-		*/
 		break;
 	case PGM_PARSER:
 		/*
