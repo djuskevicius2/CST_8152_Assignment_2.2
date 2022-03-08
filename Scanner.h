@@ -127,13 +127,13 @@ typedef struct Token {
  *  .&., .|. , .!. , SEOF.
  */
 
-/* TO_DO: Error states and illegal state */
+/* TO_DO: Error states and illegal state - COMPLETED */
 /* STATES SHOULD BEGIN AFTER THE CLOUDS - BASED ON OUR TABLE, AT 19 */
-#define ES  6		/* Error state with no retract */
-#define ER  7		/* Error state with retract */
+#define ES  19		/* Error state with no retract */
+#define ER  20		/* Error state with retract */
 #define IS -1		/* Illegal state */
 
- /* TO_DO: State transition table definition */
+ /* TO_DO: State transition table definition - COMPLETED */
 #define TABLE_COLUMNS 12
 
 /* TO_DO: Define lexeme FIXED classes */
@@ -159,6 +159,7 @@ static yago_int transitionTable[][TABLE_COLUMNS] = {
 	{    IS,    IS,   IS,   IS,   IS,   IS,   IS}  // S7: ASWR (ER)
 }; */
 
+/* TO_DO: Transition table - type of states defined in separate table - COMPLETED */
 static yago_int transitionTable[][TABLE_COLUMNS] = {
 /*	  [A-z], [0-9], 	_, fun/U,	  ",	 ',	    #,    ###,	  .,	 :,  YEOF, other	
 	   L(0),  D(1),  U(2),  M(3),  S(4), CH(5),  C(6), MLC(7), P(8), CO(9), E(10), O(11) */
@@ -180,7 +181,9 @@ static yago_int transitionTable[][TABLE_COLUMNS] = {
 	{    15,    15,    15,    15,    15,    15,    15,    16,    15,    15,    ER,    15}, // S15: NOAS
 	{    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS}, // S16: ASNR (COM)
 	{    17,    17,    17,    17,    17,    17,    17,    18,    17,    17,    ER,    17}, // S17: NOAS
-	{    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS}  // S18: ASNR (MLCOM)
+	{    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS}, // S18: ASNR (MLCOM)
+	{    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS}, // S19: ASNR (ES)
+	{    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS,    IS}  // S20: ASWR (ER)
 };
 
 /* Define accepting states types */
@@ -188,16 +191,29 @@ static yago_int transitionTable[][TABLE_COLUMNS] = {
 #define ASNR	1		/* accepting state with no retract */
 #define ASWR	2		/* accepting state with retract */
 
-/* TO_DO: Define list of acceptable states */
+/* TO_DO: Define list of acceptable states - COMPLETED */
 static yago_int stateType[] = {
 	NOAS, /* 00 */
 	NOAS, /* 01 */
-	ASNR, /* 02 (MID) - Methods */
-	ASWR, /* 03 (KEY) */
-	NOAS, /* 04 */
-	ASNR, /* 05 (SL) */
-	ASNR, /* 06 (Err1 - no retract) */
-	ASWR  /* 07 (Err2 - retract) */
+	ASWR, /* 02 (KEY)   */
+	NOAS, /* 03 */
+	ASWR, /* 04 (VID)   */
+	NOAS, /* 05 */
+	ASNR, /* 06 (FNID)  */
+	NOAS, /* 07 */
+	ASWR, /* 08 (IL)    */
+	NOAS, /* 09 */
+	ASWR, /* 10 (FPL)   */
+	NOAS, /* 11 */
+	ASNR, /* 12 (SL)    */
+	NOAS, /* 13 */
+	ASNR, /* 14 (CL)    */
+	NOAS, /* 15 */
+	ASNR, /* 16 (COM)   */
+	NOAS, /* 17 */
+	ASNR, /* 18 (MLCOM) */
+	ASNR, /* 19 (Err1 - no retract) */
+	ASWR  /* 20 (Err2 - retract) */
 };
 
 /*
@@ -221,9 +237,15 @@ Automata definitions
 typedef Token(*PTR_ACCFUN)(yago_chr* lexeme);
 
 /* Declare accepting states functions */
+Token funcKEY   (yago_chr lexeme[]);
+Token funcVID   (yago_chr lexeme[]);
+Token funcFNID  (yago_chr lexeme[]);
+Token funcIL    (yago_chr lexeme[]);
+Token funcFPL   (yago_chr lexeme[]);
 Token funcSL	(yago_chr lexeme[]);
-Token funcID	(yago_chr lexeme[]);
-Token funcKEY	(yago_chr lexeme[]);
+Token funcCL    (yago_chr lexeme);   // only one char, as it is a single char
+Token funcCOM   (yago_chr lexeme[]);
+Token funcMLCOM (yago_chr lexeme[]);
 Token funcErr	(yago_chr lexeme[]);
 
 /* 
@@ -231,16 +253,29 @@ Token funcErr	(yago_chr lexeme[]);
  * If you do not want to use the typedef, the equvalent declaration is:
  */
 
-/* TO_DO: Define final state table */
+/* TO_DO: Define final state table - COMPLETED */
 static PTR_ACCFUN finalStateTable[] = {
 	NULL,		/* -    [00] */
 	NULL,		/* -    [01] */
-	funcID,		/* MNID	[02] */
-	funcKEY,	/* KEY  [03] */
-	NULL,		/* -    [04] */
-	funcSL,		/* SL   [05] */
-	funcErr,	/* ERR1 [06] */
-	funcErr		/* ERR2 [07] */
+	funcKEY,	/* KEY  [02] */
+	NULL,		/* -    [03] */
+	funcVID,	/* VID  [04] */
+	NULL,       /* -    [05] */
+	funcFNID,   /* FNID [06] */
+	NULL,       /* -    [07] */
+	funcIL,     /* IL   [08] */
+	NULL,       /* -    [09] */
+	funcFPL,    /* FPL  [10] */
+	NULL,       /* -    [11] */
+	funcSL,     /* SL   [12] */
+	NULL,       /* -    [13] */
+	funcCL,     /* CL   [14] */
+	NULL,       /* -    [15] */
+	funcCOM,    /* COM  [16] */
+	NULL,       /* -    [17] */
+	funcMLCOM,  /* MLCOM[18] */
+	funcErr,	/* ERR1 [19] */
+	funcErr		/* ERR2 [20] */
 };
 
 /*
@@ -249,10 +284,10 @@ Language keywords
 -------------------------------------------------
 */
 
-/* TO_DO: Define the number of Keywords from the language */
-#define KWT_SIZE 26 // yago is 25
+/* TO_DO: Define the number of Keywords from the language - COMPLETED */
+#define KWT_SIZE 26 // yago is 26
 
-/* TO_DO: Define the list of keywords */
+/* TO_DO: Define the list of keywords - COMPLETED */
 static yago_chr* keywordTable[KWT_SIZE] = {
 	"if", "elif", "else",
 	"switch", "case", "default",
